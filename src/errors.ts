@@ -12,6 +12,11 @@ export class ValidationError extends GeneralError {
         this.errors = errors
     }
 }
+export class Unauthorized extends GeneralError {
+    constructor() {
+        super(401, 'Unauthorized')
+    }
+}
 
 export function Validator(body) {
     Object.setPrototypeOf(body, Object.prototype)
