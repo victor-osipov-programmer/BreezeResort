@@ -1,11 +1,11 @@
-class GeneralError extends Error {
+export class GeneralError extends Error {
     code;
     constructor(code, message) {
         super(message)
         this.code = code
     }
 }
-class ValidationError extends GeneralError {
+export class ValidationError extends GeneralError {
     errors;
     constructor(errors) {
         super(422, 'Validation error')
