@@ -18,27 +18,23 @@ export class Unauthorized extends GeneralError {
     }
 }
 
-export function Validator(body) {
+export function Validator(body, errors = {}) {
     Object.setPrototypeOf(body, Object.prototype)
-    const errors = {}
 
     this.validate = (key, type) => {
         const messages = {
             'required': `${key} is required`,
-            'number': `${key} must be a number`
+            'number': `${key} must be a number`,
+            'int': `${key} must be type a int`
         }
 
-        if (!errors.hasOwnProperty(key)) errors[key] = [];
-
-        if (type == 'required' && !body.hasOwnProperty(key)) {
-            errors[key].push(messages[type]);
-        }
-        if (errors[key].some(el => el == messages['required'])) return;
-        
-        if (type == 'number' && isNaN(parseFloat(body[key]))) {
-            errors[key].push(messages[type]);
-        }
-        if (type == 'string' && isNaN(parseFloat(body[key]))) {
+        if (errors[key]?.some(el => el == messages['required'])) return;
+        if (
+            type == 'required' && !body.hasOwnProperty(key) ||
+            type == 'number' && isNaN(parseFloat(body[key])) ||
+            type == 'int' && isNaN(parseInt(body[key]))
+        ) {
+            if (!errors.hasOwnProperty(key)) errors[key] = [];
             errors[key].push(messages[type]);
         }
     }

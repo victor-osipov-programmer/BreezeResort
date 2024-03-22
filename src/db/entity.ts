@@ -1,4 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, Relation, OneToMany, ManyToOne } from "typeorm"
+
+@Entity()
+export class Roles {
+    @PrimaryGeneratedColumn()
+    id: number
+
+    @Column()
+    name: string
+
+    @OneToMany(() => Users, users => users.role)
+    users: Relation<Users[]>
+}
 
 @Entity()
 export class Users {
@@ -6,11 +18,16 @@ export class Users {
     id: number
 
     @Column()
-    firstName: string
+    username: string
 
     @Column()
-    lastName: string
+    password: string
 
-    @Column()
-    age: number
+    @Column({
+        default: null
+    })
+    token: string
+
+    @ManyToOne(() => Roles, (roles) => roles.users)
+    role: Relation<Roles>
 }
