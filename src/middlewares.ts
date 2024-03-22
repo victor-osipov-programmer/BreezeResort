@@ -2,7 +2,6 @@ import jwt from 'jsonwebtoken'
 import { Unauthorized } from './errors'
 import { AppDataSource } from './db/data-source'
 import { Users } from './db/entity'
-import 'dotenv/config';
 const secret_key = process.env.SECRET_KEY;
 
 export function auth(roles) {
@@ -10,19 +9,24 @@ export function auth(roles) {
         try {
             if (roles.length !== 0) {
                 const token = req.get('Authorization')?.split(' ')[1]
-                console.log('token', token)
-
-                if (token) {
-                    var payload = jwt.verify(token, secret_key)
+                if (!token) {
+                    return next(new Unauthorized())
                 }
 
+                let payload = jwt.verify(token, secret_key)
+
                 const usersRepository = AppDataSource.getRepository(Users)
-                const user = await usersRepository.findOneBy({
-                    id: payload.user_id,
-                    token
+                const user = await usersRepository.findOne({
+                    where: {
+                        id: payload.user_id,
+                        token
+                    },
+                    relations: {
+                        role: true
+                    }
                 })
 
-                if (!token || !user) {
+                if (!user || user.token != token || !roles.includes(user.role.name)) {
                     return next(new Unauthorized())
                 }
 

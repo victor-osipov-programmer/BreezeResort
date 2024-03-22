@@ -31,3 +31,15 @@ export class Users {
     @ManyToOne(() => Roles, (roles) => roles.users)
     role: Relation<Roles>
 }
+
+@Entity()
+export class Rooms {
+    @PrimaryGeneratedColumn()
+    id: number
+
+    @Column()
+    name: string
+
+    @Column()
+    desc_data: string
+}

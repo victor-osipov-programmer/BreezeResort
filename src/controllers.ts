@@ -1,14 +1,12 @@
 import { AppDataSource } from './db/data-source';
-import { Users, Roles } from './db/entity';
+import { Users, Roles, Rooms } from './db/entity';
 import { GeneralError, Unauthorized, Validator } from './errors';
 import jwt from 'jsonwebtoken';
-import 'dotenv/config';
-
 const secret_key = process.env.SECRET_KEY;
-console.log('cont', secret_key)
 
 const usersRepository = AppDataSource.getRepository(Users)
 const rolesRepository = AppDataSource.getRepository(Roles)
+const roomsRepository = AppDataSource.getRepository(Rooms)
 
 export async function signup(req, res, next) {
     const body = req.body;
@@ -54,8 +52,6 @@ export async function login(req, res, next) {
         }))
     }
 
-    console.log('secret_key', secret_key)
-
     var new_token = jwt.sign({
         user: user.id
     }, secret_key)
@@ -66,6 +62,27 @@ export async function login(req, res, next) {
     res.json({
         data: {
             token_user: new_token
+        }
+    })
+}
+
+export async function room(req, res, next) {
+    const body = req.body;
+    const { name, desc_data } = body;
+
+    const { validate, reportError } = new Validator(body)
+    validate('name', 'required')
+    validate('desc_data', 'required')
+    if (reportError(next)) return
+
+    const room = new Rooms();
+    room.name = name;
+    room.desc_data = desc_data;
+    await roomsRepository.save(room);
+
+    res.json({
+        data: {
+            message: 'Created'
         }
     })
 }
