@@ -13,8 +13,11 @@ export class ValidationError extends GeneralError {
     }
 }
 export class Unauthorized extends GeneralError {
-    constructor() {
+    errors;
+    constructor(errors?) {
         super(401, 'Unauthorized')
+        if (errors)
+            this.errors = errors;
     }
 }
 

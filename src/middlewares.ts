@@ -2,7 +2,8 @@ import jwt from 'jsonwebtoken'
 import { Unauthorized } from './errors'
 import { AppDataSource } from './db/data-source'
 import { Users } from './db/entity'
-const secret_key = process.env.SECRET_KEY
+import 'dotenv/config';
+const secret_key = process.env.SECRET_KEY;
 
 export function auth(roles) {
     return async (req, res, next) => {
@@ -31,7 +32,7 @@ export function auth(roles) {
 
             next()
         } catch (err) {
-            console.log('auth middleware error' , err);
+            console.log('auth middleware error', err);
             return next(new Unauthorized())
         }
     }
