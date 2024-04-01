@@ -1,12 +1,12 @@
 import { AppDataSource } from './db/data-source';
-import { Users, Roles, Rooms } from './db/entity';
-import { GeneralError, Unauthorized, Validator } from './errors';
+import { User, Role, Room } from './db/entity';
+import { NotFound, Unauthorized, Validator } from './errors';
 import jwt from 'jsonwebtoken';
+import { roles } from './db/init'
 const secret_key = process.env.SECRET_KEY;
 
-const usersRepository = AppDataSource.getRepository(Users)
-const rolesRepository = AppDataSource.getRepository(Roles)
-const roomsRepository = AppDataSource.getRepository(Rooms)
+const usersRepository = AppDataSource.getRepository(User);
+const roomsRepository = AppDataSource.getRepository(Room);
 
 export async function signup(req, res, next) {
     const body = req.body;
@@ -17,14 +17,16 @@ export async function signup(req, res, next) {
     validate('password', 'required')
     if (reportError(next)) return
 
-    const role = await rolesRepository.findOneBy({name: 'admin'})
-
-    const user = new Users();
+    const user = new User();
     user.username = username;
     user.password = password;
-    user.role = role;
+    user.role = roles.find(role => role.name == 'admin');
 
-    await usersRepository.save(user);
+    try {
+        await usersRepository.save(user);
+    } catch (err) {
+        return next(err)
+    }
 
     res.json({
         data: {
@@ -52,12 +54,16 @@ export async function login(req, res, next) {
         }))
     }
 
-    var new_token = jwt.sign({
+    let new_token = jwt.sign({
         user: user.id
     }, secret_key)
-
     user.token = new_token;
-    await usersRepository.save(user)
+
+    try {
+        await usersRepository.save(user);
+    } catch (err) {
+        return next(err)
+    }
     
     res.json({
         data: {
@@ -75,10 +81,73 @@ export async function room(req, res, next) {
     validate('desc_data', 'required')
     if (reportError(next)) return
 
-    const room = new Rooms();
+    const room = new Room();
     room.name = name;
     room.desc_data = desc_data;
-    await roomsRepository.save(room);
+
+    try {
+        await roomsRepository.save(room);
+    } catch (err) {
+        return next(err)
+    }
+
+    res.json({
+        data: {
+            message: 'Created'
+        }
+    })
+}
+
+export async function rooms(req, res, next) {
+    const rooms = await roomsRepository.find()
+
+    res.json({
+        list: rooms
+    })
+}
+
+export async function deleteRoom(req, res, next) {
+    const room = await roomsRepository.findOneBy({
+        id: req.params.id
+    })
+    if (!room) {
+        return next(new NotFound())
+    }
+
+    await roomsRepository.remove(room)
+
+    res.json({
+        data: {
+            message: "Deleted"
+        }
+    })
+}
+
+export async function register(req, res, next) {
+    const body = req.body;
+    const { fio, email, phone, birth_date, id_childdata } = body;
+
+    const { validate, reportError } = new Validator(body)
+    validate('fio', 'required')
+    validate('email', 'required')
+    validate('phone', 'required')
+    validate('birth_date', 'required')
+    validate('id_childdata', 'required')
+    if (reportError(next)) return
+
+    const user = new User()
+    user.fio = fio;
+    user.email = email;
+    user.phone = phone;
+    user.birth_date = birth_date;
+    user.id_childdata = id_childdata;
+    user.role = roles.find(role => role.name == 'client');
+
+    try {
+        await usersRepository.save(user)
+    } catch (err) {
+        return next(err)
+    }
 
     res.json({
         data: {

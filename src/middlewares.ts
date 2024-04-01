@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 import { Unauthorized } from './errors'
 import { AppDataSource } from './db/data-source'
-import { Users } from './db/entity'
+import { User } from './db/entity'
 const secret_key = process.env.SECRET_KEY;
 
 export function auth(roles) {
@@ -15,7 +15,7 @@ export function auth(roles) {
 
                 let payload = jwt.verify(token, secret_key)
 
-                const usersRepository = AppDataSource.getRepository(Users)
+                const usersRepository = AppDataSource.getRepository(User)
                 const user = await usersRepository.findOne({
                     where: {
                         id: payload.user_id,

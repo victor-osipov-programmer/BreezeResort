@@ -1,26 +1,63 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, Relation, OneToMany, ManyToOne } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, Relation, OneToMany, ManyToOne, Unique } from "typeorm"
 
-@Entity()
-export class Roles {
+@Entity('roles')
+@Unique(['name'])
+export class Role {
     @PrimaryGeneratedColumn()
     id: number
 
     @Column()
     name: string
 
-    @OneToMany(() => Users, users => users.role)
-    users: Relation<Users[]>
+    @OneToMany(() => User, users => users.role)
+    users: Relation<User[]>
 }
 
-@Entity()
-export class Users {
+@Entity('users')
+@Unique(['username'])
+@Unique(['fio'])
+@Unique(['email'])
+@Unique(['phone'])
+export class User {
     @PrimaryGeneratedColumn()
     id: number
 
-    @Column()
+    @Column({
+        default: null
+    })
     username: string
 
-    @Column()
+    @Column({
+        default: null
+    })
+    fio: string
+
+    @Column({
+        default: null
+    })
+    email: string
+
+    @Column({
+        default: null
+    })
+    phone: string
+    
+    @Column({
+        default: null
+    })
+    birth_date: string
+
+    @Column({
+        default: null
+    })
+
+    @ManyToOne(() => Room, rooms => rooms.users)
+    @JoinColumn({name: 'id_childdata'})
+    id_childdata: Relation<Room>
+    
+    @Column({
+        default: null
+    })
     password: string
 
     @Column({
@@ -28,12 +65,14 @@ export class Users {
     })
     token: string
 
-    @ManyToOne(() => Roles, (roles) => roles.users)
-    role: Relation<Roles>
+    @ManyToOne(() => Role, (roles) => roles.users)
+    @JoinColumn({name: 'role_id'})
+    role: Relation<Role>
 }
 
-@Entity()
-export class Rooms {
+@Entity('rooms')
+@Unique(['name'])
+export class Room {
     @PrimaryGeneratedColumn()
     id: number
 
@@ -42,4 +81,7 @@ export class Rooms {
 
     @Column()
     desc_data: string
+
+    @OneToMany(() => User, users => users.id_childdata)
+    users: Relation<User[]>
 }

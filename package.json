@@ -11,8 +11,9 @@
   "name": "typeorm-test",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "commonjs",
   "scripts": {
-    "start": "node -r ts-node/register --watch src/app.ts"
+    "start": "ts-node src/app.ts"
   },
   "author": "",
   "license": "ISC",

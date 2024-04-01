@@ -20,6 +20,12 @@ export class Unauthorized extends GeneralError {
             this.errors = errors;
     }
 }
+export class NotFound extends GeneralError { errors;
+    constructor() {
+        super(403, 'Not found');
+    }
+}
+
 
 export function Validator(body, errors = {}) {
     Object.setPrototypeOf(body, Object.prototype)
