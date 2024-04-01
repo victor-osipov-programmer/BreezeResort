@@ -155,3 +155,86 @@ export async function register(req, res, next) {
         }
     })
 }
+
+export async function editUserdata(req, res, next) {
+    const body = req.body;
+
+    const user = await usersRepository.findOneBy({
+        id: req.params.id
+    })
+    if (!user) {
+        return next(new NotFound())
+    }
+
+    Object.keys(body).forEach(key => {
+        user[key] = body[key];
+    })
+
+    try {
+        await usersRepository.save(user)
+    } catch (err) {
+        return next(err)
+    }
+
+    res.json({
+        data: {
+            id: user.id,
+            message: 'Updated'
+        }
+    })
+}
+
+export async function deleteUserdata(req, res, next) {
+    const user = await usersRepository.findOneBy({
+        id: req.params.id
+    })
+    if (!user) {
+        return next(new NotFound())
+    }
+
+    await usersRepository.remove(user)
+
+    res.json({
+        data: {
+            message: 'Deleted'
+        }
+    })
+}
+
+export async function updateNumberRoom(req, res, next) {
+    const room_id = req.params.id;
+    const user_id = req.params.iduser;
+
+    const user = await usersRepository.findOneBy({
+        id: user_id
+    })
+    if (!user) {
+        return next(new NotFound())
+    }
+
+    const room = await roomsRepository.findOneBy({
+        id: room_id
+    })
+
+    user.id_childdata = room;
+
+    try {
+        await usersRepository.save(user)
+    } catch (err) {
+        return next(err)
+    }
+
+    res.json({
+        data: {
+            message: 'Changed'
+        }
+    })
+}
+
+export async function usersinroom(req, res, next) {
+    const rooms = await roomsRepository.find()
+
+    res.json({
+        data: rooms
+    })
+}
