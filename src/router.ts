@@ -13,5 +13,10 @@ router.patch('/userdata/:id', auth(['admin']), controllers.editUserdata)
 router.delete('/userdata/:id', auth(['admin']), controllers.deleteUserdata)
 router.get('/room/:id/userdata/:iduser', auth(['admin']), controllers.updateNumberRoom)
 router.get('/usersinroom', auth(['admin']), controllers.usersinroom)
+router.delete('/hotel/:id', auth(['admin']), controllers.deleteHotel)
+router.post('/hotel', auth(['admin']), controllers.hotel)
+router.get('/hotels', auth(['admin']), controllers.hotels)
+router.get('/hotel/:id/room/:idroom', auth(['admin']), controllers.addRoomInHotel)
+router.get('/roomsinhotels', auth(['admin']), controllers.roomsinhotels)
 
 export default router;

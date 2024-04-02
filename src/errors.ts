@@ -20,7 +20,7 @@ export class Unauthorized extends GeneralError {
             this.errors = errors;
     }
 }
-export class NotFound extends GeneralError { errors;
+export class NotFound extends GeneralError {
     constructor() {
         super(403, 'Not found');
     }
@@ -33,15 +33,13 @@ export function Validator(body, errors = {}) {
     this.validate = (key, type) => {
         const messages = {
             'required': `${key} is required`,
-            'number': `${key} must be a number`,
-            'int': `${key} must be type a int`
+            'number': `${key} must be a number`
         }
 
         if (errors[key]?.some(el => el == messages['required'])) return;
         if (
             type == 'required' && !body.hasOwnProperty(key) ||
-            type == 'number' && isNaN(parseFloat(body[key])) ||
-            type == 'int' && isNaN(parseInt(body[key]))
+            type == 'number' && isNaN(body[key])
         ) {
             if (!errors.hasOwnProperty(key)) errors[key] = [];
             errors[key].push(messages[type]);

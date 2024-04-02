@@ -9,7 +9,7 @@ export class Role {
     @Column()
     name: string
 
-    @OneToMany(() => User, users => users.role)
+    @OneToMany(() => User, user => user.role)
     users: Relation<User[]>
 }
 
@@ -51,7 +51,7 @@ export class User {
         default: null
     })
 
-    @ManyToOne(() => Room, rooms => rooms.users)
+    @ManyToOne(() => Room, room => room.users)
     @JoinColumn({name: 'id_childdata'})
     id_childdata: Relation<Room>
     
@@ -65,7 +65,7 @@ export class User {
     })
     token: string
 
-    @ManyToOne(() => Role, (roles) => roles.users)
+    @ManyToOne(() => Role, (role) => role.users)
     @JoinColumn({name: 'role_id'})
     role: Relation<Role>
 }
@@ -82,6 +82,26 @@ export class Room {
     @Column()
     desc_data: string
 
-    @OneToMany(() => User, users => users.id_childdata)
+    @OneToMany(() => User, user => user.id_childdata)
     users: Relation<User[]>
+
+    @ManyToOne(() => Hotel, hotel => hotel.rooms)
+    hotel: Relation<Hotel>
+}
+
+@Entity('hotels')
+@Unique(['name'])
+@Unique(['number'])
+export class Hotel {
+    @PrimaryGeneratedColumn()
+    id: number
+
+    @Column()
+    name: string
+
+    @Column()
+    number: number
+
+    @OneToMany(() => Room, room => room.hotel)
+    rooms: Relation<Room[]>
 }
